@@ -1,0 +1,268 @@
+Merging Sequence-Sequence with Skip
+
+Split
+
+match (a:Activity)-[r]->(c:Activity)
+match (b:Activity1)-[l]->(d:Invisible_Task)
+where type(r)='SEQUENCE' and type(l)<>'SEQUENCE' and a.name=b.name and d.name='Skip'
+with a,b,c,d,l,r
+CALL apoc.merge.relationship(b, "XORSPLIT", {},{}, c) YIELD rel as relation1
+delete r
+________________________________________________________________________________________________________
+
+match (a:Activity)-[r]->(b:Activity)
+match (e:Invisible_Task)<-[m]-(c:Activity1)-[l]->(d:Activity1)
+where type(r)='SEQUENCE' and type(l)<>'SEQUENCE' and type(m)<>'SEQUENCE' and a.name=c.name and b.name=d.name and e.name='Skip' 
+create(i:Invisible_Task)
+with i,a,b,c,d,e,m,l,r
+CALL apoc.create.relationship(c, "XORSPLIT", {}, b) YIELD rel as relation1
+CALL apoc.create.relationship(b, type(l), {}, i) YIELD rel as relation2
+delete r,l
+
+with collect(i) as excnodes
+call apoc.refactor.mergeNodes(excnodes,{
+properties:"combine",
+mergeRels:true
+})
+YIELD node
+return count(*)
+________________________________________________________________________________________________________
+
+Join
+
+match (a:Activity)-[r]->(c:Activity)
+match (b:Invisible_Task)-[l]->(d:Activity1)
+where type(r)='SEQUENCE' and type(l)<>'SEQUENCE' and c.name=d.name and b.name='Skip'
+with a,b,c,d,l,r
+CALL apoc.merge.relationship(a, "XORJOIN", {},{}, d) YIELD rel as relation1
+delete r
+________________________________________________________________________________________________________
+
+match (c:Invisible_Task)<-[s]-(a:Activity)-[r]->(b:Activity)
+match (d:Activity1)-[l]->(e:Activity1)
+where type(r)='SEQUENCE' and type(s)<>'SEQUENCE' and type(l)<>'SEQUENCE' and a.name=d.name 
+create(i:Invisible_Task)
+with i,a,b,c,d,e,l,r,s
+CALL apoc.create.relationship(b, "XORJOIN", {}, i) YIELD rel as relation1
+CALL apoc.create.relationship(c, "XORJOIN", {}, i) YIELD rel as relation2
+CALL apoc.merge.relationship(a, type(s), {}, {}, b) YIELD rel as relation3
+delete r,l
+
+with collect(i) as excnodes
+call apoc.refactor.mergeNodes(excnodes,{
+properties:"combine",
+mergeRels:true
+})
+YIELD node
+return count(*)
+________________________________________________________________________________________________________
+
+match (c:Invisible_Task)<-[s]-(a:Activity)-[r]->(b:Activity)
+match (d:Invisible_Task)-[l]->(e:Activity1)
+where type(r)='SEQUENCE' and type(s)<>'SEQUENCE' and type(l)<>'SEQUENCE' and b.name=e.name and d.name='Skip'
+with a,b,c,d,e,l,r,s
+CALL apoc.create.relationship(c, "XORJOIN", {}, e) YIELD rel as relation1
+delete r
+________________________________________________________________________________________________________
+
+Merging Sequence-Sequence with Redo
+
+Split
+
+match (a:Activity)-[r]->(c:Activity)
+match (b:Activity1)-[l]->(d:Activity1)
+where type(r)='SEQUENCE' and type(l)<>'SEQUENCE' and a.name=b.name
+create(i:Invisible_Task)
+with i,a,b,c,d,l,r
+CALL apoc.create.relationship(a, "XORSPLIT", {}, i) YIELD rel as relation1
+CALL apoc.create.relationship(i, type(l), {}, d) YIELD rel as relation2
+CALL apoc.merge.relationship(a, "XORSPLIT", {},{}, c) YIELD rel as relation3
+delete r,l
+
+with collect(i) as excnodes
+call apoc.refactor.mergeNodes(excnodes,{
+properties:"combine",
+mergeRels:true
+})
+YIELD node
+return count(*)
+________________________________________________________________________________________________________
+
+match (a:Activity)-[r]->(b:Activity)
+match (c:Activity1)-[l]->(d:Activity1)
+where type(r)='SEQUENCE' and type(l)<>'SEQUENCE' and a.name=c.name and b.name=d.name
+create(i:Invisible_Task)
+with i,a,b,c,d,l,r
+CALL apoc.create.relationship(a, type(l), {}, d) YIELD rel as relation1
+CALL apoc.create.relationship(d, "XORSPLIT", {}, i) YIELD rel as relation2
+delete r,l
+
+with collect(i) as excnodes
+call apoc.refactor.mergeNodes(excnodes,{
+properties:"combine",
+mergeRels:true
+})
+YIELD node
+return count(*)
+________________________________________________________________________________________________________
+
+match (a:Activity)-[r]->(b:Activity)
+match (e:Invisible_Task)<-[m]-(c:Activity1)-[l]->(d:Activity1)
+where type(r)='SEQUENCE' and type(l)='SEQUENCE' and a.name=c.name
+with a,b,c,d,e,l,m,r
+CALL apoc.create.relationship(e, type(r), {}, b) YIELD rel as relation1
+CALL apoc.merge.relationship(c, "XORSPLIT", {}, {}, d) YIELD rel as relation2
+delete r,l
+________________________________________________________________________________________________________
+
+Join
+
+match (a:Activity)-[r]->(c:Activity)
+match (b:Activity1)-[l]->(d:Activity1)
+where type(r)='SEQUENCE' and type(l)<>'SEQUENCE' and c.name=d.name
+create(i:Invisible_Task)
+with i,a,b,c,d,l,r
+CALL apoc.create.relationship(b, type(l), {}, i) YIELD rel as relation1
+CALL apoc.create.relationship(i, "XORJOIN", {}, c) YIELD rel as relation2
+CALL apoc.merge.relationship(a, "XORJOIN", {},{}, c) YIELD rel as relation3
+delete r,l
+
+with collect(i) as excnodes
+call apoc.refactor.mergeNodes(excnodes,{
+properties:"combine",
+mergeRels:true
+})
+YIELD node
+return count(*)
+________________________________________________________________________________________________________
+
+match (a:Invisible_Task)-[r]->(b:Activity)
+match (c:Activity1)-[l]->(d:Activity1)
+where type(r)='SEQUENCE' and type(l)<>'SEQUENCE' and b.name=d.name
+create(i:Invisible_Task)
+with i,a,b,c,d,l,r
+CALL apoc.create.relationship(i, "XORJOIN", {}, b) YIELD rel as relation1
+CALL apoc.create.relationship(c, type(l), {}, i) YIELD rel as relation2
+CALL apoc.merge.relationship(a, "XORJOIN", {},{}, b) YIELD rel as relation3
+delete r,l
+
+with collect(i) as excnodes
+call apoc.refactor.mergeNodes(excnodes,{
+properties:"combine",
+mergeRels:true
+})
+YIELD node
+return count(*)
+________________________________________________________________________________________________________
+
+Merging XOR-Sequence
+
+Split
+
+match (a:Activity)-[r]->(c:Activity)
+match (b:Activity1)-[l]->(d:Activity1)
+where type(r)='SEQUENCE' and type(l)<>'SEQUENCE' and a.name=b.name
+with a,b,c,d,l,r
+CALL apoc.merge.relationship(b, "XORSPLIT", {},{}, c) YIELD rel as relation1
+delete r
+________________________________________________________________________________________________________
+
+match (a:Activity)-[r]->(b:Activity)
+match (e:Activity1)<-[m]-(c:Activity1)-[l]->(d:Activity1)
+where type(r)='SEQUENCE' and type(l)<>'SEQUENCE' and type(m)<>'SEQUENCE' and a.name=c.name and b.name=d.name
+create(i:Invisible_Task)
+with i,a,b,c,d,e,m,l,r
+CALL apoc.create.relationship(c, "XORSPLIT", {}, b) YIELD rel as relation1
+CALL apoc.create.relationship(b, type(l), {}, i) YIELD rel as relation2
+delete r,l
+
+with collect(i) as excnodes
+call apoc.refactor.mergeNodes(excnodes,{
+properties:"combine",
+mergeRels:true
+})
+YIELD node
+return count(*)
+________________________________________________________________________________________________________
+
+Join
+
+match (a:Activity)-[r]->(c:Activity)
+match (b:Activity1)-[l]->(d:Activity1)
+where type(r)='SEQUENCE' and type(l)<>'SEQUENCE' and c.name=d.name
+with a,b,c,d,l,r
+CALL apoc.merge.relationship(a, "XORJOIN", {},{}, d) YIELD rel as relation1
+delete r
+________________________________________________________________________________________________________
+
+match (c:Invisible_Task)<-[s]-(a:Activity)-[r]->(b:Activity)
+match (d:Activity1)-[l]-> (e:Activity1)
+where type(r)='SEQUENCE' and type(s)<>'SEQUENCE' and type(l)='SEQUENCE' and a.name=d.name 
+create(i:Invisible_Task)
+with i,a,b,c,d,e,l,r,s
+CALL apoc.create.relationship(e, "XORJOIN", {}, i) YIELD rel as relation1
+CALL apoc.create.relationship(c, "XORJOIN", {}, i) YIELD rel as relation2
+CALL apoc.merge.relationship(a, type(s), {}, {}, e) YIELD rel as relation3
+delete r,l
+
+with collect(i) as excnodes
+call apoc.refactor.mergeNodes(excnodes,{
+properties:"combine",
+mergeRels:true
+})
+YIELD node
+return count(*)
+
+________________________________________________________________________________________________________
+
+match (c:Invisible_Task)<-[s]-(a:Activity1)-[r]->(b:Activity1)
+where type(r)<>'SEQUENCE' and type(s)<>'SEQUENCE'
+with a,b,c,r,s
+CALL apoc.create.relationship(c, "XORJOIN", {}, b) YIELD rel as relation1
+delete r
+________________________________________________________________________________________________________
+
+Merging (AND OR)-XOR
+
+Split
+
+match (b:Activity)<-[s]-(a:Activity)-[r]->(c:Activity)
+match (e:Activity1)<-[m]-(d:Activity1)-[l]->(f:Activity1)
+where (type(r)='ANDSPLIT' or type(r)='ORSPLIT' and type(s)='ANDSPLIT' or type(s)='ORSPLIT') and type(l)='XORSPLIT' and type(m)='XORSPLIT' and a.name=d.name and c.name=f.name
+create(i:Invisible_Task)
+with i,a,b,c,d,e,f,l,m,r,s
+CALL apoc.create.relationship(d, "XORSPLIT", {}, i) YIELD rel as relation1
+CALL apoc.create.relationship(i, type(r), {}, b) YIELD rel as relation2
+CALL apoc.create.relationship(i, type(s), {}, c) YIELD rel as relation3
+CALL apoc.merge.relationship(d, "XORSPLIT", {}, {}, e) YIELD rel as relation4
+delete l,r,s
+
+with collect(i) as excnodes
+call apoc.refactor.mergeNodes(excnodes,{
+properties:"combine",
+mergeRels:true
+})
+YIELD node
+return count(*)
+________________________________________________________________________________________________________
+
+Join
+
+match (b:Activity)-[s]->(a:Activity)<-[r]-(c:Activity)
+match (e:Activity1)-[m]->(d:Activity1)<-[l]-(f:Activity1)
+where (type(r)='ANDJOIN' or type(r)='ORJOIN' and type(s)='ANDJOIN' or type(s)='ORJOIN') and type(l)='XORJOIN' and type(m)='XORJOIN' and a.name=d.name and c.name=f.name
+create(i:Invisible_Task)
+with i,a,b,c,d,e,f,l,m,r,s
+CALL apoc.create.relationship(i, "XORJOIN", {}, d) YIELD rel as relation1
+CALL apoc.create.relationship(b, type(r), {}, i) YIELD rel as relation2
+CALL apoc.create.relationship(c, type(s), {}, i) YIELD rel as relation3
+CALL apoc.merge.relationship(e, "XORJOIN", {}, {}, d) YIELD rel as relation4
+delete l,r,s
+
+with collect(i) as excnodes
+call apoc.refactor.mergeNodes(excnodes,{
+properties:"combine",
+mergeRels:true
+})
+YIELD node
+return count(*)
