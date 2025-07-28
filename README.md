@@ -1,17 +1,17 @@
 # 🏁 Tugas Akhir (TA) - Final Project
 
-**Nama Mahasiswa**: [Nama Lengkap]  
-**NRP**: [Nomor Registrasi Pokok]  
-**Judul TA**: [Judul Tugas Akhir]  
-**Dosen Pembimbing**: [Nama Dosen]  
-**Dosen Ko-pembimbing**: [Nama Dosen]
+**Nama Mahasiswa**: Syamil Hibban Ahmad  
+**NRP**: 05111840000041  
+**Judul TA**: Metode Graph-based Process Merging untuk Menggabungkan Proses Bisnis Mengandung Invisible Task  
+**Dosen Pembimbing**: Dr. Kelly Rossa Sungkono, S.Kom.,M.Kom.  
+**Dosen Ko-pembimbing**: Prof. Drs.Ec. Ir. Riyanarto Sarno, M.Sc.,Ph.D.
 
 ---
 
 ## 📺 Demo Aplikasi  
-Embed video demo di bawah ini (ganti `VIDEO_ID` dengan ID video YouTube Anda):  
+Embed video demo di bawah ini:  
 
-[![Demo Aplikasi](https://i.ytimg.com/vi/zIfRMTxRaIs/maxresdefault.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)  
+[![Demo Aplikasi](https://i.ytimg.com/vi/ZQmuyrXHyek/maxresdefault.jpg)](https://www.youtube.com/watch?v=ZQmuyrXHyek)  
 *Klik gambar di atas untuk menonton demo*
 
 ---
